@@ -1,11 +1,12 @@
 from django.contrib import admin
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
-from myapp.views import EmployeeList,EmployeeDetail 
-
+from myapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-	path('employees', EmployeeList.as_view()), 
-	path('employees/<str:pk>', EmployeeDetail.as_view()), 
+	path('employees', views.getEmployeeListOrCreate, 
+		name="Employee List OR Create Employee"),
+	path('employees/<str:pk>', views.getEmployeeDetailsOrUpdateOrDelete, 
+		name="Employee Details OR Update OR Delete"),
 ]
