@@ -5,8 +5,6 @@ from myapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-	path('employees', views.getEmployeeListOrCreate, 
-		name="Employee List OR Create Employee"),
-	path('employees/<str:pk>', views.getEmployeeDetailsOrUpdateOrDelete, 
-		name="Employee Details OR Update OR Delete"),
+	path('employees', views.getEmployeeListOrCreate.as_view()),
+	path('employees/<str:pk>', views.getEmployeeDetailsOrUpdateOrDelete.as_view()),
 ]

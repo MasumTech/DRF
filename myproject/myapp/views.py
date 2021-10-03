@@ -1,45 +1,31 @@
-from rest_framework import status
-from django.http import JsonResponse
-from rest_framework.decorators import api_view
-from rest_framework.response import Response 
 from . models import Employee
 from . serializers import EmployeeSerializer
-
-@api_view(['GET','POST'])
-def getEmployeeListOrCreate(request):
-	if request.method == "GET":
-		getAllEmployees = Employee.objects.all()
-		serializer = EmployeeSerializer(getAllEmployees, many=True)
-		return Response(serializer.data)
-
-	elif request.method == "POST":
-		serializer = EmployeeSerializer(data=request.data)
-		if serializer.is_valid():
-			serializer.save()
-			return Response(serializer.data, status=status.HTTP_201_CREATED)
-		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+from rest_framework import mixins
+from rest_framework import generics
 
 
-@api_view(['GET','PUT', 'DELETE'])
-def getEmployeeDetailsOrUpdateOrDelete(request, pk):
-	try: 
-		getTheEmployee = Employee.objects.get(id=pk)
-	except Employee.DoesNotExist:
-		return Response(status=status.HTTP_404_NOT_FOUND)
+class getEmployeeListOrCreate(mixins.ListModelMixin, mixins.CreateModelMixin, 
+	generics.GenericAPIView):
+	queryset = Employee.objects.all()
+	serializer_class = EmployeeSerializer
 
-	if request.method =='GET':
-		serializer = EmployeeSerializer(getTheEmployee, many=False)
-		return Response(serializer.data)
+	def get(self, request, *args, **kwargs):
+		return self.list(request, *args, **kwargs)	 
 
-	elif request.method == 'PUT':
-		serializer = EmployeeSerializer(instance=getTheEmployee,
-			data=request.data)
-		if serializer.is_valid():
-			serializer.save()
-			return Response(serializer.data)	
-		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)	
+	def post(self, request, *args, **kwargs):
+		return self.create(request, *args, **kwargs)	 
 
-	elif request.method == 'DELETE':
-		getTheEmployee.delete()
-		return Response(status=status.HTTP_204_NO_CONTENT)	
+ 
+class getEmployeeDetailsOrUpdateOrDelete(mixins.RetrieveModelMixin, 
+	mixins.UpdateModelMixin, mixins.DestroyModelMixin,generics.GenericAPIView):
+	queryset = Employee.objects.all()
+	serializer_class = EmployeeSerializer
 
+	def get(self, request, *args, **kwargs):
+		return self.retrieve(request, *args, **kwargs)
+
+	def put(self, request, *args, **kwargs):
+		return self.update(request, *args, **kwargs)
+
+	def delete(self, request, *args, **kwargs):
+		return self.destroy(request, *args, **kwargs)		
